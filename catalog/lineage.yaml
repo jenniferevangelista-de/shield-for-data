@@ -1,0 +1,23 @@
+# Fictional lineage and owners for the Shield demo.
+# Same shape Shield reads from OpenMetadata: an asset, its owners, what depends on it.
+assets:
+  sales.orders:
+    kind: table
+    owners: [orders-team]
+    downstream: [finance.revenue_daily, ml.churn_features]
+  finance.revenue_daily:
+    kind: table
+    owners: [finance-analytics]
+    downstream: [dashboard.daily_revenue]
+  ml.churn_features:
+    kind: table
+    owners: [ml-platform]
+    downstream: []
+  dashboard.daily_revenue:
+    kind: dashboard
+    owners: [bi-team]
+    downstream: []
+  "upstream:payments_*":
+    kind: file
+    owners: [payments-team]
+    downstream: [sales.orders]
