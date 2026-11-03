@@ -6,7 +6,9 @@ Built for the [Flip the Switch hackathon](https://www.wemakedevs.org/hackathons/
 
 [![ci](https://github.com/jenniferevangelista-de/shield-for-data/actions/workflows/ci.yml/badge.svg)](https://github.com/jenniferevangelista-de/shield-for-data/actions/workflows/ci.yml)
 
-> Demo video: _link added on submission_
+**Demo video (3 min):** [shield_demo.mp4](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_demo.mp4) · **Explainer (77 s):** [shield_explainer.mp4](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_explainer.mp4)
+
+![Shield's finding in the data-quality channel: what broke, why it matters, who is affected and the proposed fix](docs/img/finding.png)
 
 ---
 
@@ -39,6 +41,10 @@ shield   F-1 approved by jen. Applied hold_dashboard + rerun_partition:
 ```
 
 Every step is written to an audit table and to a **"Shield audit trail" document attached to the room**, so whoever joins the channel later can see who approved what and when.
+
+![Approving F-1 in the channel: Shield holds the report, re-runs the partition, re-checks and releases the hold](docs/img/approve.gif)
+
+![The audit trail in the channel: every scan, approval and rejection with who did it](docs/img/audit.png)
 
 ## The six checks
 

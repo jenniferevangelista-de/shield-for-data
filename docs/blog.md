@@ -11,7 +11,9 @@ I spent the Flip the Switch hackathon building **Shield**, an agent that checks 
 
 Everything here was run on Switch 0.31.0 in a GitHub Codespace. All the data is fictional.
 
-{% youtube VIDEO_ID %}
+**Watch it work:** [3-minute demo](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_demo.mp4) · [77-second explainer](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_explainer.mp4)
+
+![Approving a fix in the channel: Shield holds the report, re-runs the partition, checks again and releases the hold](https://raw.githubusercontent.com/jenniferevangelista-de/shield-for-data/main/docs/img/approve.gif)
 
 ## What Switch is, in one paragraph
 
@@ -133,7 +135,7 @@ Each finding gets an id and three possible answers, all plain messages in the ro
 
 Switch passes the sender's name with every message, so the audit trail records who decided. Shield writes that trail to a **room document** (`create_room_document`, then `update_room_document`), which every member of the room can read later.
 
-![Approval and the re-check result](https://raw.githubusercontent.com/jenniferevangelista-de/shield-for-data/main/docs/img/approve.gif)
+![The audit trail Shield keeps in the room: who did what, and when](https://raw.githubusercontent.com/jenniferevangelista-de/shield-for-data/main/docs/img/audit.png)
 
 The main check is the business-date gate from my article [Your pipeline ran green and shipped last week's data anyway](https://dev.to/jenniferevangelistade/your-pipeline-ran-green-and-shipped-last-weeks-data-anyway-1il3): the greatest attempt per job and date wins, and a date is ready only when every required job's newest attempt succeeded for that date. The other five checks (schema, row count, nulls, duplicates, late files) are a Great Expectations suite, and owners come from a catalog adapter shaped like OpenMetadata's API.
 
