@@ -131,7 +131,7 @@ The `switch-e2e` job in [CI](.github/workflows/ci.yml) does the whole thing on a
 | Variable | Default | What it does |
 |---|---|---|
 | `SHIELD_LLM_URL` | `http://localhost:11434/v1` | Any OpenAI-compatible chat endpoint. The default is a local [Ollama](https://ollama.com) |
-| `SHIELD_LLM_MODEL` | `gemma3:1b` | The model Shield talks to |
+| `SHIELD_LLM_MODEL` | `gemma3:4b` | The model Shield talks to. `gemma3:1b` is faster on a small CPU but misreads more free-form requests |
 | `SHIELD_LLM_KEY` | unset | Bearer key, only if your endpoint needs one |
 | `SHIELD_LLM` | `on` | `off` turns the model off: fixed explanations and exact commands only (CI runs this way) |
 | `OPENMETADATA_URL`, `OPENMETADATA_TOKEN`, `OPENMETADATA_FQN_PREFIX` | unset | Read owners and lineage from OpenMetadata and record incidents there instead of `catalog/lineage.yaml` |
@@ -139,16 +139,16 @@ The `switch-e2e` job in [CI](.github/workflows/ci.yml) does the whole thing on a
 
 ## The model: small, local, and never in charge
 
-Shield's AI runs on your machine: an open model (Gemma 3 1B by default) served by [Ollama](https://ollama.com) through its OpenAI-compatible API, so it is free and no data leaves the host.
+Shield's AI runs on your machine: an open model (Gemma 3 4B by default, or Gemma 3 1B on smaller machines) served by [Ollama](https://ollama.com) through its OpenAI-compatible API, so it is free and no data leaves the host.
 
 ```bash
-ollama pull gemma3:1b          # once; Shield finds Ollama on localhost:11434
+ollama pull gemma3:4b          # once; Shield finds Ollama on localhost:11434
 ```
 
 It does two jobs:
 
 - **Explains impact.** The "why it matters" line on each finding is written by the model from the check, the summary and the downstream assets. If the model's answer contains a number or runs long, Shield discards it and uses a fixed sentence, because numbers must come from the checks.
-- **Understands plain language.** `@shield are today's numbers ok?` becomes `scan`, and `@shield which team owns the orders table?` becomes `who sales.orders`. Read-only requests run straight away. Anything that changes data does not: `@shield sure, go ahead with F-1` gets "I read that as `@shield approve F-1`. I only change data on an exact command", so a misread can never touch the warehouse.
+- **Understands plain language.** `@shield are today's numbers ok?` becomes `scan`, and `@shield which team owns the orders table?` becomes `who orders`, which Shield resolves to `sales.orders`. Read-only requests run straight away. Anything that changes data does not: `@shield sure, go ahead with F-1` gets "I read that as `@shield approve F-1`. I only change data on an exact command", so a misread can never touch the warehouse.
 
 Without Ollama, Shield still works: it uses the fixed sentences and the exact commands.
 

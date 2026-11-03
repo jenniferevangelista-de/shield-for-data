@@ -58,6 +58,9 @@ class MockCatalog:
                 return asset
         return None
 
+    def names(self) -> list[str]:
+        return [n for n in self._assets if not n.endswith("*")]
+
     def downstream(self, name: str) -> list[Asset]:
         seen: list[Asset] = []
         queue = list(self.asset(name).downstream) if self.asset(name) else []

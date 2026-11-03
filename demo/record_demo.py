@@ -19,13 +19,14 @@ from playwright.sync_api import Page, sync_playwright
 
 URL = os.environ.get("MATTERMOST_URL", "http://localhost:18065")
 CHANNEL = f"{URL}/switch/channels/{os.environ.get('SHIELD_ROOM', 'data-quality')}"
-SIZE = {"width": 1440, "height": 900}
+VIEW = {"width": 1280, "height": 720}  # rendered at 1.5x, so chat text is readable in 1080p
+SIZE = {"width": 1920, "height": 1080}
 
 # scene name -> list of (message, text that Shield's reply must contain)
 SCENES = {
     "01_stale_scan": [
         ("@shield break stale_business_date", "Demo incident seeded"),
-        ("@shield scan", "Proposed fix"),
+        ("@shield are today's numbers ok to publish?", "Proposed fix"),
     ],
     "02_stale_approve": [
         ("@shield approve F-1", "Re-check passed"),
@@ -33,11 +34,13 @@ SCENES = {
     "03_schema_drift": [
         ("@shield break schema_drift", "Demo incident seeded"),
         ("@shield scan", "Proposed fix"),
+        ("@shield which team owns the orders table?", "is owned by"),
         ("@shield approve F-1", "Re-check still fails"),
     ],
     "04_duplicates_edit_reject": [
         ("@shield break duplicate_keys", "Demo incident seeded"),
         ("@shield scan", "Proposed fix"),
+        ("@shield sure, go ahead with F-1", "exact command"),
         ("@shield approve F-1", "Re-check passed"),
         ("@shield break null_spike", "Demo incident seeded"),
         ("@shield scan", "Proposed fix"),
@@ -81,7 +84,7 @@ def say(page: Page, text: str, expect: str) -> None:
     box.press_sequentially(text, delay=45)
     page.wait_for_timeout(400)
     box.press("Enter")
-    for _ in range(240):  # up to two minutes for Shield's reply
+    for _ in range(360):  # up to three minutes for Shield's reply
         if posts.count() > before:
             break
         page.wait_for_timeout(500)
@@ -97,14 +100,14 @@ def main(out_dir: str) -> None:
     with sync_playwright() as p:
         browser = p.chromium.launch()
         state = out / "state.json"
-        ctx = browser.new_context(viewport=SIZE)
+        ctx = browser.new_context(viewport=VIEW, device_scale_factor=1.5)
         page = ctx.new_page()
         login(page)
         ctx.storage_state(path=str(state))
         ctx.close()
         for name, steps in SCENES.items():
             tmp = out / f"_{name}"
-            ctx = browser.new_context(viewport=SIZE, storage_state=str(state),
+            ctx = browser.new_context(viewport=VIEW, device_scale_factor=1.5, storage_state=str(state),
                                       record_video_dir=str(tmp), record_video_size=SIZE)
             page = ctx.new_page()
             open_channel(page)

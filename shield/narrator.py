@@ -1,6 +1,6 @@
 """Shield's language model: explanations and free-form messages.
 
-Shield uses an open model served locally by Ollama (default `gemma3:1b`)
+Shield uses an open model served locally by Ollama (default `gemma3:4b`; `gemma3:1b` is lighter but misreads more)
 through its OpenAI-compatible API, so it costs nothing and no data leaves the
 machine. Any OpenAI-compatible endpoint works: set `SHIELD_LLM_URL`,
 `SHIELD_LLM_MODEL` and, if needed, `SHIELD_LLM_KEY`.
@@ -54,7 +54,7 @@ def _chat(prompt: str, max_tokens: int, timeout: float) -> str:
         f"{url}/chat/completions",
         headers=headers,
         json={
-            "model": os.environ.get("SHIELD_LLM_MODEL", "gemma3:1b"),
+            "model": os.environ.get("SHIELD_LLM_MODEL", "gemma3:4b"),
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": max_tokens,
             "temperature": 0.1,

@@ -68,15 +68,15 @@ def main(rec_dir: str, output: str) -> None:
                 "-crf", "20", "-c:a", "aac", "-b:a", "160k", "-shortest", str(clip))
         else:
             video = rec / f"{s['scene']}.webm"
-            vlen = duration(video)
+            vlen = duration(video) - 2.5  # the first seconds are the channel loading
             target = narr + 1.5
-            # Speed long scenes up (typing and waiting) but never beyond 2.2x, so text stays readable.
-            speed = min(max(vlen / target, 1.0), 2.2)
+            # Speed long scenes up (typing and waiting) but never beyond 3x, so text stays readable.
+            speed = min(max(vlen / target, 1.0), 3.0)
             total = max(target, vlen / speed)
             vf = (f"setpts=PTS/{speed:.3f},scale={W}:{H}:force_original_aspect_ratio=decrease,"
                   f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:color=0x0d1420,"
                   f"tpad=stop_mode=clone:stop_duration=30,format=yuv420p")
-            run("ffmpeg", "-y", "-i", str(video), "-i", str(audio), "-t", f"{total:.2f}", "-vf", vf,
+            run("ffmpeg", "-y", "-ss", "2.5", "-i", str(video), "-i", str(audio), "-t", f"{total:.2f}", "-vf", vf,
                 "-af", "adelay=300|300,apad", "-r", "30", "-c:v", "libx264", "-preset", "veryfast",
                 "-crf", "20", "-c:a", "aac", "-b:a", "160k", str(clip))
         parts.append(clip)

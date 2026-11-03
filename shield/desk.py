@@ -184,6 +184,11 @@ class Desk:
 
     def cmd_who(self, args, sender) -> list[Reply]:
         name = args[0] if args else "sales.orders"
+        if self.catalog.asset(name) is None and hasattr(self.catalog, "names"):
+            # "orders" or "the orders table" -> sales.orders
+            words = [w.lower().strip("?.,") for w in args if len(w) > 3]
+            match = next((n for n in self.catalog.names() for w in words if w in n.lower()), None)
+            name = match or name
         owners, downstream = owners_affected(self.catalog, name)
         if not owners and not downstream:
             return [Reply(f"`{name}` is not in the catalog.")]
