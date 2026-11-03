@@ -3,7 +3,8 @@
 Needs ffmpeg, edge-tts and Playwright (for rendering the cards). Run it where
 the recordings are, never on a slow laptop: it encodes 1080p video.
 
-    python demo/build_video.py out/ shield_demo.mp4
+    python demo/build_video.py out/ shield_demo.mp4                       # the demo
+    python demo/build_video.py out/ shield_explainer.mp4 explainer.json   # the explainer
 """
 
 from __future__ import annotations
@@ -46,11 +47,11 @@ async def speak(text: str, voice: str, rate: str, path: Path) -> None:
     await edge_tts.Communicate(text, voice, rate=rate).save(str(path))
 
 
-def main(rec_dir: str, output: str) -> None:
+def main(rec_dir: str, output: str, script_name: str = "script.json") -> None:
     rec = Path(rec_dir)
     work = rec / "build"
     work.mkdir(parents=True, exist_ok=True)
-    script = json.loads((HERE / "script.json").read_text())
+    script = json.loads((HERE / script_name).read_text())
     segs = script["segments"]
     render_cards([s["card"] for s in segs if "card" in s], work)
 
@@ -89,4 +90,4 @@ def main(rec_dir: str, output: str) -> None:
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    main(*sys.argv[1:4])

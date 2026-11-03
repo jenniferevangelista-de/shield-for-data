@@ -1,0 +1,36 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "rate": "+2%",
+  "segments": [
+    {
+      "id": "xtitle",
+      "card": "xtitle",
+      "text": "Hi, I'm Jennifer Evangelista, a data engineering and solutions architecture specialist from Brazil. In one minute, here is the idea behind Shield."
+    },
+    {
+      "id": "problem",
+      "card": "problem",
+      "text": "A scheduler can tell you that every job succeeded. It cannot tell you that the jobs processed the right day. A backfill that finishes this morning still belongs to last week, and a gate that only checks today's runs lets it through."
+    },
+    {
+      "id": "gate",
+      "card": "gate",
+      "text": "So the gate asks a different question. Every run records the business date it processed and its attempt number. The newest attempt wins. And a date is ready only when every required job succeeded for the date the report needs."
+    },
+    {
+      "id": "loop",
+      "card": "loop",
+      "text": "A check is only half the answer, because someone still has to decide what happens next. Shield scans, explains the impact, names the owners and proposes a fix. A person approves, edits or rejects it in the chat. Shield applies only what was approved, checks again, and writes everything to an audit trail."
+    },
+    {
+      "id": "arch",
+      "card": "arch",
+      "text": "Switch is what makes that a team workflow. It turns the channel into a room, decides who can talk to Shield, carries each decision with the person's name, and keeps the audit document where the whole team can see it."
+    },
+    {
+      "id": "close",
+      "card": "close",
+      "text": "Checks by Shield. Decisions by people. In the chat your team already uses."
+    }
+  ]
+}

@@ -77,6 +77,33 @@
   </svg>
 </section>
 
+<section class="card" id="gate">
+  <div class="kicker">The business-date gate</div>
+  <h2>Ask which date the data is for,<br>not when the job ran.</h2>
+  <div class="row">
+    <div class="clock"><b>1 · Record</b>Every run writes job, business date, attempt and state.</div>
+    <div class="clock"><b>2 · Newest attempt wins</b>A later failure hides an earlier success until it is resolved.</div>
+    <div class="clock"><b>3 · Ready only if</b>every required job succeeded <span class="ok">for the date the report needs</span>.</div>
+  </div>
+</section>
+
+<section class="card" id="loop">
+  <div class="kicker">The workflow</div>
+  <h2>Shield proposes. A person decides.</h2>
+  <div class="row" style="font-size:34px">
+    <div class="clock"><b>Shield</b>scans<br>explains the impact<br>names the owners<br>proposes a fix</div>
+    <div class="clock" style="border:3px solid var(--accent)"><b>Engineer, in chat</b>approve<br>edit the fix<br>or reject with a reason</div>
+    <div class="clock"><b>Shield</b>applies only what was approved<br>checks again<br>writes the audit trail</div>
+  </div>
+</section>
+
+<section class="card" id="xtitle">
+  <svg class="shield"><use href="#shield"/></svg>
+  <h1>Why a green pipeline<br>is not enough</h1>
+  <p class="lead">The idea behind Shield, in one minute.</p>
+  <div class="foot">Jennifer Evangelista · Flip the Switch hackathon</div>
+</section>
+
 <section class="card" id="repro">
   <div class="kicker">Run it yourself</div>
   <h2>Clone, start Switch, talk to Shield.</h2>
