@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: pytest
+
+  switch-e2e:
+    # A real Switch server, its Mattermost, Shield, and a person typing in the channel.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e .
+      - name: Start Switch 0.31.0 with Mattermost
+        run: bash scripts/up.sh
+      - name: Register Shield and create the room
+        run: python -m shield.agent --bootstrap
+      - name: Run Shield and the end-to-end conversation
+        env:
+          SHIELD_LLM: "off"
+        run: |
+          nohup python -m shield.agent > agent.log 2>&1 &
+          sleep 10
+          python scripts/e2e.py
+      - name: Agent log
+        if: always()
+        run: cat agent.log || true
