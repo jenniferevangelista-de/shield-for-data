@@ -139,6 +139,15 @@ Switch passes the sender's name with every message, so the audit trail records w
 
 The main check is the business-date gate from my article [Your pipeline ran green and shipped last week's data anyway](https://dev.to/jenniferevangelistade/your-pipeline-ran-green-and-shipped-last-weeks-data-anyway-1il3): the greatest attempt per job and date wins, and a date is ready only when every required job's newest attempt succeeded for that date. The other five checks (schema, row count, nulls, duplicates, late files) are a Great Expectations suite, and owners come from a catalog adapter shaped like OpenMetadata's API.
 
+### Where the AI sits, and where it does not
+
+Shield's language model is a small open model, Gemma 3 4B, served on the same machine by [Ollama](https://ollama.com) through its OpenAI-compatible API, so it costs nothing and no data leaves the host. It has two jobs:
+
+- It writes the "why it matters" line from the finding. If its answer contains a number or runs long, Shield throws it away and uses a fixed sentence, because the numbers have to come from the checks.
+- It understands plain language. `@shield are today's numbers ok to publish?` runs a scan. `@shield sure, go ahead with F-1` does **not** approve anything: Shield answers "I read that as `@shield approve F-1`. I only change data on an exact command." A misread can cost a message, never a table.
+
+That boundary is the design choice I would repeat in any agent that touches production data: let the model read and explain, and keep every write behind an exact, human command.
+
 ## Step 7: test it like a person would
 
 Mattermost has a plain REST API, so an end-to-end test can log in as the demo user, post `@shield break stale_business_date`, `@shield scan`, `@shield approve F-1`, and wait for each reply. In my repo, that runs on a fresh GitHub Actions runner on every push: start Switch, register Shield, play every scenario. If the test passes, the README is telling the truth.
