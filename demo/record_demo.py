@@ -61,8 +61,8 @@ def load_env(path: str = ".env") -> None:
 def login(page: Page) -> None:
     page.goto(f"{URL}/login")
     page.get_by_text("View in Browser").click(timeout=20_000)
-    page.get_by_placeholder("Email or Username").fill(os.environ.get("MATTERMOST_USER", "user"))
-    page.get_by_placeholder("Password").fill(os.environ["MATTERMOST_USER_PASSWORD"])
+    page.locator("#input_loginId").fill(os.environ.get("MATTERMOST_USER", "user"))
+    page.locator("#input_password-input").fill(os.environ["MATTERMOST_USER_PASSWORD"])
     page.keyboard.press("Enter")
     page.wait_for_url("**/switch/**", timeout=30_000)
 

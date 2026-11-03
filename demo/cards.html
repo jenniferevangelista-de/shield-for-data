@@ -1,0 +1,104 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  :root { --bg:#0d1420; --panel:#152033; --ink:#eef3fb; --mute:#9fb0c8; --accent:#3dd6b0; --warn:#ffb347; --bad:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { width:1920px; height:1080px; background:var(--bg); color:var(--ink);
+         font-family: "Inter","Segoe UI","DejaVu Sans",sans-serif; overflow:hidden; }
+  .card { display:none; width:1920px; height:1080px; padding:120px 140px; position:relative; }
+  .card.on { display:flex; flex-direction:column; justify-content:center; }
+  .kicker { color:var(--accent); font-size:30px; letter-spacing:4px; text-transform:uppercase; font-weight:700; }
+  h1 { font-size:120px; line-height:1.02; margin:22px 0 28px; font-weight:800; }
+  h2 { font-size:72px; line-height:1.1; margin:18px 0 36px; font-weight:800; }
+  p.lead { font-size:40px; color:var(--mute); max-width:1400px; line-height:1.35; }
+  .foot { position:absolute; left:140px; bottom:70px; color:var(--mute); font-size:26px; }
+  .shield { width:150px; height:170px; }
+  .row { display:flex; gap:40px; align-items:stretch; }
+  .clock { flex:1; background:var(--panel); border-radius:24px; padding:40px; font-size:34px; line-height:1.4; }
+  .clock b { display:block; font-size:30px; color:var(--mute); text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; }
+  .ok { color:var(--accent); } .no { color:var(--bad); }
+  .term { background:#070b12; border-radius:20px; padding:40px 48px; font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;
+          font-size:34px; line-height:1.6; color:#d6e2f3; }
+  .term .c { color:#6b7d96; } .term .g { color:var(--accent); }
+</style></head>
+<body>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="shield" viewBox="0 0 100 115"><path d="M50 4 L92 20 V55 C92 82 73 101 50 111 C27 101 8 82 8 55 V20 Z" fill="#3dd6b0"/>
+  <path d="M30 57 L45 72 L72 42" stroke="#0d1420" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</defs></svg>
+
+<section class="card" id="title">
+  <svg class="shield"><use href="#shield"/></svg>
+  <h1>Shield for data</h1>
+  <p class="lead">A data quality teammate that lives in your team chat. It checks, explains and proposes. People approve. Built on Switch.</p>
+  <div class="foot">Flip the Switch hackathon · Track 01 Business Workflow · Jennifer Evangelista</div>
+</section>
+
+<section class="card" id="problem">
+  <div class="kicker">The incident</div>
+  <h2>The pipeline ran green<br>and shipped last week's data.</h2>
+  <div class="row">
+    <div class="clock"><b>Run clock</b>Started today 05:30<br><span class="ok">✔ all 3 jobs SUCCESS</span></div>
+    <div class="clock"><b>Business date processed</b>2026-10-29<br><span class="no">✘ a backfill for last week</span></div>
+    <div class="clock"><b>The 08:00 report needs</b>2026-11-05<br><span class="no">✘ not loaded</span></div>
+  </div>
+  <div class="foot">From "Your pipeline ran green and shipped last week's data anyway" (Medium / DEV)</div>
+</section>
+
+<section class="card" id="arch">
+  <div class="kicker">How it fits together</div>
+  <svg viewBox="0 0 1640 640" width="1640" height="640" style="margin-top:30px">
+    <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#9fb0c8"/></marker></defs>
+    <g font-size="30" fill="#eef3fb" font-family="Inter,Segoe UI,DejaVu Sans,sans-serif">
+      <rect x="0" y="210" width="330" height="200" rx="22" fill="#152033"/>
+      <text x="165" y="290" text-anchor="middle" font-weight="700">Data engineer</text>
+      <text x="165" y="335" text-anchor="middle" fill="#9fb0c8" font-size="25">Mattermost, Slack, Teams,</text>
+      <text x="165" y="368" text-anchor="middle" fill="#9fb0c8" font-size="25">Discord or Telegram</text>
+
+      <rect x="440" y="90" width="520" height="440" rx="26" fill="none" stroke="#3dd6b0" stroke-width="4"/>
+      <text x="700" y="145" text-anchor="middle" font-weight="800" fill="#3dd6b0">Switch</text>
+      <rect x="480" y="180" width="440" height="90" rx="16" fill="#152033"/><text x="700" y="236" text-anchor="middle">Room: data-quality</text>
+      <rect x="480" y="290" width="440" height="90" rx="16" fill="#152033"/><text x="700" y="346" text-anchor="middle">@mentions + addressing policy</text>
+      <rect x="480" y="400" width="440" height="90" rx="16" fill="#152033"/><text x="700" y="456" text-anchor="middle">Audit document in the room</text>
+
+      <rect x="1070" y="90" width="570" height="440" rx="26" fill="#152033"/>
+      <text x="1355" y="150" text-anchor="middle" font-weight="800">Shield agent</text>
+      <text x="1110" y="215" font-size="27" fill="#9fb0c8">agent protocol: SSE down, HTTP up</text>
+      <text x="1110" y="275">• Business-date gate</text>
+      <text x="1110" y="325">• Great Expectations contract</text>
+      <text x="1110" y="375">• Fixes, only after approval</text>
+      <text x="1110" y="425">• OpenMetadata-shaped catalog</text>
+      <text x="1110" y="475">• DuckDB demo warehouse</text>
+
+      <line x1="335" y1="310" x2="432" y2="310" stroke="#9fb0c8" stroke-width="4" marker-start="url(#a)" marker-end="url(#a)"/>
+      <line x1="965" y1="310" x2="1062" y2="310" stroke="#9fb0c8" stroke-width="4" marker-start="url(#a)" marker-end="url(#a)"/>
+    </g>
+  </svg>
+</section>
+
+<section class="card" id="repro">
+  <div class="kicker">Run it yourself</div>
+  <h2>Clone, start Switch, talk to Shield.</h2>
+  <div class="term">
+    <div><span class="c">$</span> bash scripts/up.sh <span class="c"># Switch 0.31.0 + Mattermost</span></div>
+    <div><span class="c">$</span> python -m shield.agent --bootstrap</div>
+    <div><span class="c">$</span> python -m shield.agent</div>
+    <div><span class="c">$</span> pytest <span class="g">  38 passed</span></div>
+    <div><span class="c">$</span> python scripts/e2e.py <span class="g">  every scenario completed through Switch</span></div>
+  </div>
+  <div class="foot">github.com/jenniferevangelista-de/shield-for-data</div>
+</section>
+
+<section class="card" id="close">
+  <svg class="shield"><use href="#shield"/></svg>
+  <h1>Checks by Shield.<br>Decisions by people.</h1>
+  <p class="lead">In the chat your team already uses, through Switch.</p>
+  <div class="foot">Fictional data throughout. github.com/jenniferevangelista-de/shield-for-data</div>
+</section>
+
+<script>
+  const id = new URLSearchParams(location.search).get("card") || "title";
+  document.getElementById(id).classList.add("on");
+</script>
+</body></html>

@@ -1,0 +1,26 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "rate": "+2%",
+  "segments": [
+    {"id": "title", "card": "title",
+     "text": "Hi, I'm Jennifer Evangelista, a data engineering and solutions architecture specialist from Brazil. This is Shield, a data quality teammate that lives in your team chat, built on Switch."},
+    {"id": "problem", "card": "problem",
+     "text": "Here is an incident I wrote about. Every job ran green this morning, but it was a backfill for last week. The gate only asked whether the jobs ran today, not which business date they processed, so last week's numbers were about to ship as today's."},
+    {"id": "arch", "card": "arch",
+     "text": "Shield is a custom agent on the Switch agent protocol. Switch turns a Mattermost channel into a room with the engineer and Shield, delivers only the messages that mention Shield, and keeps an audit document in the room. Shield runs a Great Expectations contract, the business date gate from my article, and reads owners and lineage from an OpenMetadata shaped catalog."},
+    {"id": "01_stale_scan", "scene": "01_stale_scan",
+     "text": "I seed that exact incident on a fictional warehouse and ask Shield to scan. It sees that the runs were green for October twenty ninth, not November fifth. It lists everything downstream with its owners, and proposes a fix: hold the eight o'clock report and re-run today's partition. Nothing changes yet."},
+    {"id": "02_stale_approve", "scene": "02_stale_approve",
+     "text": "I approve in the channel. Shield holds the dashboard, re-runs the three jobs for the right business date, checks again, and because the check now passes, it puts the report back on schedule."},
+    {"id": "03_schema_drift", "scene": "03_schema_drift",
+     "text": "Not every problem can be fixed from here. When a producer renames a column, Shield proposes holding the report and notifying the owners. After I approve, it records an incident in the catalog, and it says plainly that the check still fails until the producer restores the contract."},
+    {"id": "04_duplicates_edit_reject", "scene": "04_duplicates_edit_reject",
+     "text": "Duplicate keys get a dedupe, confirmed by a fresh check. And I stay in charge. This null spike comes from a test load I know about, so I reject the finding with a reason, and Shield leaves the data alone."},
+    {"id": "05_audit", "scene": "05_audit",
+     "text": "Every scan, approval, rejection and fix lands in the audit trail, with who did it and when. It is in the chat, and it is a document attached to the Switch room."},
+    {"id": "repro", "card": "repro",
+     "text": "Everything is reproducible. One script starts Switch with its bundled Mattermost. A bootstrap registers Shield and creates the room. Thirty eight unit tests cover the checks, and an end to end test runs the whole conversation through Switch on a fresh GitHub runner."},
+    {"id": "close", "card": "close",
+     "text": "Shield does the checking and the explaining. People make the call, in the chat they already use. Thanks for watching."}
+  ]
+}
