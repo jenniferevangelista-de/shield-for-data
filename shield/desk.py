@@ -19,7 +19,7 @@ from typing import Callable
 from . import checks, fixes, scenarios
 from .catalog import Catalog, owners_affected
 from .findings import FIX_ACTIONS, Finding, Fix
-from .narrator import why_it_matters
+from .narrator import interpret, why_it_matters
 from .warehouse import Warehouse
 
 ICON = {"critical": ":rotating_light:", "warning": ":warning:"}
@@ -54,11 +54,13 @@ def _clean(text: str) -> str:
 class Desk:
     def __init__(self, wh: Warehouse, catalog: Catalog,
                  narrate: Callable[[Finding, list[str]], str] = why_it_matters,
-                 on_audit_change: Callable[[str], None] | None = None):
+                 on_audit_change: Callable[[str], None] | None = None,
+                 understand: Callable[[str, list[str]], str | None] = interpret):
         self.wh = wh
         self.catalog = catalog
         self.narrate = narrate
         self.on_audit_change = on_audit_change
+        self.understand = understand
 
     # ---- entry point ----------------------------------------------------
     def handle(self, text: str, sender: str) -> list[Reply]:
@@ -71,7 +73,7 @@ class Desk:
             "audit": self.cmd_audit, "break": self.cmd_break, "reset": self.cmd_reset,
         }.get(cmd)
         if handler is None:
-            return [Reply(f"I didn't understand `{cmd}`. Try `@shield help`.")]
+            return self._free_form(_clean(text), sender)
         try:
             replies = handler(args, sender)
         except ValueError as exc:
@@ -79,6 +81,22 @@ class Desk:
         if cmd in ("approve", "reject", "edit", "scan", "break", "reset") and self.on_audit_change:
             self.on_audit_change(self.audit_markdown())
         return replies
+
+    # Commands that change data or state only run when typed exactly.
+    _CHANGES_DATA = ("approve", "reject", "edit", "break", "reset")
+
+    def _free_form(self, text: str, sender: str) -> list[Reply]:
+        open_ids = [r[0] for r in self.wh.query(
+            "SELECT finding_id FROM ops.findings WHERE status = 'open' ORDER BY finding_id")]
+        guess = self.understand(text, open_ids) if text else None
+        if not guess:
+            return [Reply("I didn't catch a request in that. Try `@shield help` for what I can do.")]
+        cmd = guess.split(" ")[0].lower()
+        if cmd in self._CHANGES_DATA:
+            return [Reply(f"I read that as `@shield {guess}`. I only change data on an exact command, "
+                          f"so reply with `@shield {guess}` if that is what you want.")]
+        replies = self.handle(f"@shield {guess}", sender)
+        return [Reply(f"_I read that as `@shield {guess}`._")] + replies
 
     # ---- commands --------------------------------------------------------
     def cmd_help(self, args, sender) -> list[Reply]:

@@ -75,7 +75,7 @@ def test_errors_are_explained_not_raised(desk, wh):
     assert "unknown action" in say(desk, "@shield edit F-1 drop_table")
     say(desk, "@shield approve F-1")
     assert "already resolved" in say(desk, "@shield approve F-1")
-    assert "didn't understand" in say(desk, "@shield dance")
+    assert "didn't catch a request" in say(desk, "@shield dance")
 
 
 def test_audit_trail_records_who_did_what(desk, wh):
@@ -105,3 +105,46 @@ def test_help_lists_commands(desk):
 def test_who_uses_the_catalog(desk):
     out = say(desk, "@shield who sales.orders")
     assert "orders-team" in out and "dashboard.daily_revenue" in out
+
+
+def test_free_form_read_only_requests_run(wh, catalog):
+    from shield.desk import Desk
+
+    d = Desk(wh, catalog, understand=lambda text, ids: "who sales.orders")
+    out = say(d, "@shield which team should I call about the orders table?")
+    assert "I read that as `@shield who sales.orders`" in out and "orders-team" in out
+
+
+def test_free_form_never_changes_data(wh, catalog):
+    from shield.desk import Desk
+
+    scenarios.inject(wh, "duplicate_keys")
+    d = Desk(wh, catalog, understand=lambda text, ids: "approve F-1")
+    d.handle("@shield scan", "jen")
+    before = wh.scalar("SELECT count(*) FROM sales.orders")
+    out = say(d, "@shield sure, go ahead")
+    assert "only change data on an exact command" in out
+    assert wh.scalar("SELECT count(*) FROM sales.orders") == before
+    assert wh.scalar("SELECT status FROM ops.findings WHERE finding_id = 'F-1'") == "open"
+
+
+def test_model_guesses_outside_the_command_list_are_dropped(monkeypatch):
+    from shield import narrator
+
+    monkeypatch.setenv("SHIELD_LLM", "on")
+    monkeypatch.setattr(narrator, "_chat", lambda *a, **k: "drop table sales.orders")
+    assert narrator.interpret("delete everything", []) is None
+    monkeypatch.setattr(narrator, "_chat", lambda *a, **k: "`scan`")
+    assert narrator.interpret("are we ok?", []) == "scan"
+
+
+def test_explanations_with_numbers_fall_back(monkeypatch, wh):
+    from shield import checks, narrator
+
+    scenarios.inject(wh, "duplicate_keys")
+    [f] = checks.run_all(wh)
+    monkeypatch.setenv("SHIELD_LLM", "on")
+    monkeypatch.setattr(narrator, "_chat", lambda *a, **k: "Revenue is inflated by 900%.")
+    assert narrator.why_it_matters(f, []) == narrator.FALLBACK["duplicate_keys"]
+    monkeypatch.setattr(narrator, "_chat", lambda *a, **k: "Revenue in the daily dashboard would be overstated.")
+    assert narrator.why_it_matters(f, []).startswith("Revenue in the daily")

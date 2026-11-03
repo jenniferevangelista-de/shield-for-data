@@ -7,7 +7,7 @@
     {"id": "problem", "card": "problem",
      "text": "Here is an incident I wrote about. Every job ran green this morning, but it was a backfill for last week. The gate only asked whether the jobs ran today, not which business date they processed, so last week's numbers were about to ship as today's."},
     {"id": "arch", "card": "arch",
-     "text": "Shield is a custom agent on the Switch agent protocol. Switch turns a Mattermost channel into a room with the engineer and Shield, delivers only the messages that mention Shield, and keeps an audit document in the room. Shield runs a Great Expectations contract, the business date gate from my article, and reads owners and lineage from an OpenMetadata shaped catalog."},
+     "text": "Shield is a custom agent on the Switch agent protocol. Switch turns a Mattermost channel into a room with the engineer and Shield, delivers only the messages that mention Shield, and keeps an audit document in the room. Shield runs a Great Expectations contract, the business date gate from my article, reads owners and lineage from an OpenMetadata shaped catalog, and uses Gemma, a small open model running locally, to explain the impact."},
     {"id": "01_stale_scan", "scene": "01_stale_scan",
      "text": "I seed that exact incident on a fictional warehouse and ask Shield to scan. It sees that the runs were green for October twenty ninth, not November fifth. It lists everything downstream with its owners, and proposes a fix: hold the eight o'clock report and re-run today's partition. Nothing changes yet."},
     {"id": "02_stale_approve", "scene": "02_stale_approve",
@@ -19,7 +19,7 @@
     {"id": "05_audit", "scene": "05_audit",
      "text": "Every scan, approval, rejection and fix lands in the audit trail, with who did it and when. It is in the chat, and it is a document attached to the Switch room."},
     {"id": "repro", "card": "repro",
-     "text": "Everything is reproducible. One script starts Switch with its bundled Mattermost. A bootstrap registers Shield and creates the room. Thirty eight unit tests cover the checks, and an end to end test runs the whole conversation through Switch on a fresh GitHub runner."},
+     "text": "Everything is reproducible. One script starts Switch with its bundled Mattermost. A bootstrap registers Shield and creates the room. Forty two unit tests cover the checks, and an end to end test runs the whole conversation through Switch on a fresh GitHub runner."},
     {"id": "close", "card": "close",
      "text": "Shield does the checking and the explaining. People make the call, in the chat they already use. Thanks for watching."}
   ]
