@@ -52,7 +52,16 @@ def main() -> int:
     mm = MattermostUser()
     ch = mm.channel(ROOM)["id"]
     print(f"Channel {ROOM} found; talking to @shield as {mm.me['username']}")
-    step(mm, ch, "@shield help", "Shield")
+    # Switch marks a freshly started agent online after its first heartbeats.
+    # Until then it answers "offline" on the agent's behalf, so ask until Shield replies.
+    for attempt in range(6):
+        try:
+            step(mm, ch, "@shield help", "only changes data after you approve", timeout=30)
+            break
+        except TimeoutError:
+            print(f"  Shield not online yet (attempt {attempt + 1}), asking again")
+    else:
+        raise SystemExit("Shield never came online in the room")
     for scenario, verdict in EXPECTED.items():
         print(f"- {scenario}")
         step(mm, ch, f"@shield break {scenario}", "Demo incident seeded")
