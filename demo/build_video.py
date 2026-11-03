@@ -81,7 +81,7 @@ def main(rec_dir: str, output: str, script_name: str = "script.json") -> None:
             # Speed long scenes up (typing and waiting) but never beyond 3x, so text stays readable.
             speed = min(max(vlen / target, 1.0), 3.0)
             total = max(target, vlen / speed)
-            vf = (f"setpts=PTS/{speed:.3f},scale={W}:{H}:force_original_aspect_ratio=decrease,"
+            vf = (f"setpts=PTS/{speed:.3f},scale={W}:{H}:force_original_aspect_ratio=decrease:flags=lanczos,"
                   f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:color=0x0d1420,"
                   f"tpad=stop_mode=clone:stop_duration=30,format=yuv420p")
             run("ffmpeg", "-y", "-ss", "2.5", "-i", str(video), "-i", str(audio), "-t", f"{total:.2f}", "-vf", vf,

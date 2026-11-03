@@ -19,8 +19,7 @@ from playwright.sync_api import Page, sync_playwright
 
 URL = os.environ.get("MATTERMOST_URL", "http://localhost:18065")
 CHANNEL = f"{URL}/switch/channels/{os.environ.get('SHIELD_ROOM', 'data-quality')}"
-VIEW = {"width": 1280, "height": 720}  # rendered at 1.5x, so chat text is readable in 1080p
-SIZE = {"width": 1920, "height": 1080}
+VIEW = {"width": 1280, "height": 720}  # scaled to 1080p by the builder, so chat text stays readable
 
 # scene name -> list of (message, text that Shield's reply must contain)
 SCENES = {
@@ -108,7 +107,7 @@ def main(out_dir: str) -> None:
         for name, steps in SCENES.items():
             tmp = out / f"_{name}"
             ctx = browser.new_context(viewport=VIEW, device_scale_factor=1.5, storage_state=str(state),
-                                      record_video_dir=str(tmp), record_video_size=SIZE)
+                                      record_video_dir=str(tmp), record_video_size=VIEW)
             page = ctx.new_page()
             open_channel(page)
             for text, expect in steps:
