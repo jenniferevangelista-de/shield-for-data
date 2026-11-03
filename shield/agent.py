@@ -62,6 +62,28 @@ def make_catalog():
     return MockCatalog(os.environ.get("SHIELD_LINEAGE", "catalog/lineage.yaml"), STATE_DIR / "incidents.jsonl")
 
 
+def open_to_room_members(agent_id: str) -> None:
+    """Let the people in the room address Shield.
+
+    Switch makes a newly registered agent answer only its owner. An agent
+    registered with the server's registration token is owned by a bootstrap
+    account, so nobody could talk to it. The Gateway admin clears that policy;
+    who can reach Shield is then decided by who is in the room.
+    """
+    import requests
+
+    email, password = os.environ.get("GATEWAY_ADMIN_EMAIL"), os.environ.get("GATEWAY_ADMIN_PASSWORD")
+    if not (email and password):
+        log.warning("GATEWAY_ADMIN_EMAIL/PASSWORD not set: only the agent owner can address Shield")
+        return
+    http = requests.Session()
+    r = http.post(f"{switch_url()}/gateway/auth/login", json={"email": email, "password": password}, timeout=20)
+    r.raise_for_status()
+    r = http.put(f"{switch_url()}/gateway/agents/{agent_id}/addressing-policy", json={"policy": None}, timeout=20)
+    r.raise_for_status()
+    log.info("room members can now address %s", AGENT_NAME)
+
+
 def bootstrap() -> dict:
     token = os.environ["AGENT_REGISTRATION_TOKEN"]
     humans = [u for u in os.environ.get("SHIELD_ROOM_USERS", "user").split(",") if u]
@@ -83,6 +105,7 @@ def bootstrap() -> dict:
         "instructions": ROOM_INSTRUCTIONS,
     }, connection_id=conn)
     stream.close()
+    open_to_room_members(agent_id)
     state = {"agent_id": agent_id, "api_key": api_key, "room_id": room["id"],
              "connection_id": str(uuid.uuid4()), "audit_doc_id": None}
     save_state(state)
