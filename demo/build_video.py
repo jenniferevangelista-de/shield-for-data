@@ -43,8 +43,15 @@ def render_cards(names: list[str], out: Path) -> None:
         b.close()
 
 
-async def speak(text: str, voice: str, rate: str, path: Path) -> None:
-    await edge_tts.Communicate(text, voice, rate=rate).save(str(path))
+async def speak(text: str, voice: str, rate: str, path: Path, attempts: int = 5) -> None:
+    for i in range(attempts):  # the TTS service drops a request now and then
+        try:
+            await edge_tts.Communicate(text, voice, rate=rate).save(str(path))
+            return
+        except edge_tts.exceptions.NoAudioReceived:
+            if i == attempts - 1:
+                raise
+            await asyncio.sleep(3 * (i + 1))
 
 
 def main(rec_dir: str, output: str, script_name: str = "script.json") -> None:
