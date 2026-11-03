@@ -11,6 +11,14 @@ I spent the Flip the Switch hackathon building **Shield**, an agent that checks 
 
 Everything here was run on Switch 0.31.0 in a GitHub Codespace. All the data is fictional.
 
+**Shield at a glance**
+
+- **6** incident types caught: stale business date on a green pipeline, row count drop, schema drift, null spike, duplicate keys and a late upstream file
+- **5** Great Expectations expectations plus the business-date gate behind those checks
+- **5** fix actions, and **0** of them run without a person approving in the chat
+- **42** unit tests, plus an end-to-end test that plays every scenario through a real Switch server on a fresh GitHub runner
+- **US$ 0** to run: self-hosted Switch, a local open model, free CI
+
 **Watch it work:** [3-minute demo](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_demo.mp4) · [77-second explainer](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_explainer.mp4)
 
 ![Approving a fix in the channel: Shield holds the report, re-runs the partition, checks again and releases the hold](https://raw.githubusercontent.com/jenniferevangelista-de/shield-for-data/main/docs/img/approve.gif)
