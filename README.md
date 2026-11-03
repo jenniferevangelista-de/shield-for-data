@@ -6,7 +6,7 @@ Built for the [Flip the Switch hackathon](https://www.wemakedevs.org/hackathons/
 
 [![ci](https://github.com/jenniferevangelista-de/shield-for-data/actions/workflows/ci.yml/badge.svg)](https://github.com/jenniferevangelista-de/shield-for-data/actions/workflows/ci.yml)
 
-**Demo video (3 min):** [shield_demo.mp4](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_demo.mp4) · **Explainer (77 s):** [shield_explainer.mp4](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_explainer.mp4)
+**Demo video (3 min):** [shield_demo.mp4](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_demo.mp4) · **Blog (step by step for first-time Switch users):** [Switch from zero on DEV](https://dev.to/jenniferevangelistade/switch-from-zero-ship-a-human-in-the-loop-data-quality-agent-to-your-team-chat-4cm9) · **Explainer (77 s):** [shield_explainer.mp4](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_explainer.mp4)
 
 ![Shield's finding in the data-quality channel: what broke, why it matters, who is affected and the proposed fix](docs/img/finding.png)
 
