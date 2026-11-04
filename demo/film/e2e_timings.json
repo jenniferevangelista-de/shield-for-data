@@ -1,0 +1,94 @@
+[
+ {
+  "message": "@shield help",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield break stale_business_date",
+  "seconds": 9.04
+ },
+ {
+  "message": "@shield scan",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield approve F-1",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield break row_count_drop",
+  "seconds": 9.04
+ },
+ {
+  "message": "@shield scan",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield approve F-1",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield break schema_drift",
+  "seconds": 9.04
+ },
+ {
+  "message": "@shield scan",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield approve F-1",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield break null_spike",
+  "seconds": 9.04
+ },
+ {
+  "message": "@shield scan",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield approve F-1",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield break duplicate_keys",
+  "seconds": 9.04
+ },
+ {
+  "message": "@shield scan",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield approve F-1",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield break late_upstream",
+  "seconds": 9.04
+ },
+ {
+  "message": "@shield scan",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield approve F-1",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield break null_spike",
+  "seconds": 9.04
+ },
+ {
+  "message": "@shield scan",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield reject F-1 false alarm, known test load",
+  "seconds": 1.52
+ },
+ {
+  "message": "@shield audit",
+  "seconds": 1.52
+ }
+]

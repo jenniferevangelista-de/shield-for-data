@@ -22,6 +22,8 @@ from shieldy import shieldy  # noqa: E402
 
 MINT = (176, 232, 214); TEAL = (30, 140, 130)
 VOICE = HERE / "voice"
+IMG = HERE.parents[1] / "docs" / "img"
+MEAS = json.loads((HERE / "measured.json").read_text(encoding="utf-8"))
 
 
 @lru_cache(maxsize=1)
@@ -87,6 +89,25 @@ def dark_overlay(img, k):
 
 
 # ------------------------------------------------------------------ props
+@lru_cache(maxsize=8)
+def _photo(name, w):
+    im = Image.open(IMG / name).convert("RGB")
+    h = int(im.height * w / im.width); im = im.resize((w, h), Image.LANCZOS)
+    framed = Image.new("RGBA", (w + 24, h + 24), (255, 255, 255, 255)); framed.paste(im, (12, 12))
+    return framed
+
+
+def tape_photo(img, name, cx, cy, w, ang, k=1.0):
+    """A real screenshot from the repository, taped onto the paper."""
+    if k <= 0: return
+    ph = _photo(name, w).rotate(ang, expand=True, resample=Image.BICUBIC)
+    y = int(cy - ph.height / 2 + (1 - eout(k)) * 60)
+    shadow = Image.new("RGBA", ph.size, (0, 0, 0, 60))
+    img.paste(shadow, (int(cx - ph.width / 2) + 10, y + 12), ph); img.paste(ph, (int(cx - ph.width / 2), y), ph)
+    d = ImageDraw.Draw(img, "RGBA")
+    for tx in (cx - w * 0.35, cx + w * 0.35):
+        d.polygon([(tx - 60, y - 14), (tx + 60, y - 4), (tx + 54, y + 30), (tx - 66, y + 20)], fill=(250, 236, 170, 200))
+
 def check(d, t, x, y, k, seed, col=GREEN, s=1.0):
     if k > 0:
         wline(d, [(x - 18 * s, y), (x - 4 * s, y + 16 * s), (x - 4 * s + 34 * s * eout(k), y + 16 * s - 44 * s * eout(k))], t, seed, int(8 * s), col)
@@ -214,13 +235,11 @@ def sc_cost(img, d, t):
 
 def sc_room(img, d, t):
     a = A("room")
-    chat_window(d, t, 220, 140, 1380, 900)
-    k1 = seg(t, a + 0.6, a + 1.2); k2 = seg(t, at("room", 0.45), at("room", 0.6))
-    bubble(d, t, 280, 300, "@shield scan", 910, k1, "engineer")
-    bubble(d, t, 560, 450, "On it. Nothing changes until you approve.", 920, k2, "shield", (232, 250, 242), who_col=TEAL)
-    if t > at("room", 0.6):
-        text(d, "members:", 1520, 300, 40, INK); text(d, "engineer", 1520, 370, 44, NAVY); text(d, "shield", 1520, 440, 44, TEAL)
-    if t > at("room", 0.8): stamp(img, "ROOM ONLY", 1600, 620, -6, NAVY, 64)
+    tape_photo(img, "channel.png", 760, 470, 1180, -2, seg(t, a + 0.2, a + 0.9))
+    d = ImageDraw.Draw(img)
+    if t > at("room", 0.35): text(d, "the real channel", 1620, 200, 44, TEAL)
+    if t > at("room", 0.5): text(d, "Mattermost + Switch", 1620, 270, 40, INK)
+    if t > at("room", 0.8): stamp(img, "ROOM ONLY", 1620, 470, -6, NAVY, 64)
     return img
 
 
@@ -243,21 +262,13 @@ def sc_six(img, d, t):
 
 def sc_explain(img, d, t):
     a = A("explain")
-    k = seg(t, a + 0.3, a + 1.0)
-    if k > 0:
-        s = eout(k)
-        wrect(d, 200, 140, 200 + 1300 * s, 140 + 700 * s, t, 800, 8, fill=WHITE)
-    if k >= 1:
-        d.rectangle((208, 148, 1492, 168), fill=RED)
-        text(d, "F-1 · business_date_gate · critical", 260, 220, 50, RED, "lm", "impact.ttf")
-        rows = [("what broke", "green runs for Oct 29, not Nov 05", at("explain", 0.15)),
-                ("why it matters", "written by Gemma, on this machine", at("explain", 0.62)),
-                ("affected", "revenue · churn features · dashboard", at("explain", 0.3)),
-                ("owners", "4 teams, from the catalog", at("explain", 0.35)),
-                ("proposed fix", "hold the report + re-run the partition", at("explain", 0.45))]
-        for i, (h, v, ts) in enumerate(rows):
-            if t > ts:
-                y = 320 + i * 105; text(d, h, 270, y, 36, SOFT, "lm"); text(d, v, 600, y, 42, INK, "lm")
+    tape_photo(img, "finding.png", 680, 480, 1220, 1.5, seg(t, a + 0.2, a + 0.9))
+    d = ImageDraw.Draw(img)
+    notes = [("what broke", at("explain", 0.2)), ("why it matters", at("explain", 0.3)), ("who is downstream", at("explain", 0.42)),
+             ("proposed fix", at("explain", 0.55)), ("why: Gemma, local", at("explain", 0.75))]
+    for i, (lab, ts) in enumerate(notes):
+        if t > ts:
+            y = 190 + i * 125; wline(d, [(1340, y), (1420, y)], t, 820 + i, 6, RED); text(d, lab, 1440, y, 40, RED, "lm")
     return img
 
 
@@ -271,7 +282,56 @@ def sc_approve(img, d, t):
     for i, (s, f) in enumerate(STEPS):
         y = 450 + i * 120; k = seg(t, at("approve", f), at("approve", f + 0.05))
         if k > 0: check(d, t, 760, y - 4, k, 1020 + i, s=1.3); text(d, s, 820, y, 50, INK, "lm")
-    if t > at("approve", 0.88): stamp(img, "RE-CHECK PASSED", 1330, 860, -5, GREEN, 72)
+    if t > at("approve", 0.8):
+        n = MEAS["scenarios"]["stale_business_date"]["after"]["rows_today"]
+        big_number(d, t, 1520, 280, n, "orders for Nov 05", seg(t, at("approve", 0.8), at("approve", 0.92)), GREEN, 1030)
+    if t > at("approve", 0.9): stamp(img, "RE-CHECK PASSED", 1380, 870, -5, GREEN, 72)
+    return img
+
+
+def sc_before_after(img, d, t):
+    sc = MEAS["scenarios"]
+    dup_b, dup_a = sc["duplicate_keys"]["before"], sc["duplicate_keys"]["after"]
+    nb, na = sc["null_spike"]["before"], sc["null_spike"]["after"]
+    sb, sa = sc["stale_business_date"]["before"], sc["stale_business_date"]["after"]
+    text(d, "BEFORE", 560, 140, 90, RED, "mm", "impact.ttf"); text(d, "AFTER", 1400, 140, 90, GREEN, "mm", "impact.ttf")
+    text(d, "without Shield", 560, 215, 36, SOFT); text(d, "with Shield, after approval", 1400, 215, 36, SOFT)
+    wline(d, [(1020, 130), (1020, 840)], t, 1100, 6, SOFT)
+    pct = nb["null_customer_rows"] * 100 // nb["rows_today"]
+    rows = [("duplicates", f"{dup_b['rows_today']:,} orders · ${dup_b['revenue_today']:,.0f}",
+             f"{dup_a['rows_today']:,} orders · ${dup_a['revenue_today']:,.0f}", 0.05),
+            ("", f"{dup_b['duplicate_rows']} duplicated orders", f"{dup_a['duplicate_rows']} duplicates", 0.2),
+            ("no customer", f"{nb['null_customer_rows']} orders ({pct}%)", f"{na['null_customer_rows']} left in the report", 0.38),
+            ("wrong day", f"{sb['rows_today']} orders for Nov 05", f"{sa['rows_today']} orders for Nov 05", 0.55)]
+    for i, (lab, b, af, f) in enumerate(rows):
+        y = 330 + i * 125
+        if t > at("before_after", f):
+            if lab: text(d, lab, 560, y - 46, 28, SOFT, "mm")
+            text(d, b, 560, y, 40, RED, "mm"); cross(d, t, 985, y, 1, 1110 + i)
+        if t > at("before_after", f + 0.08):
+            text(d, af, 1400, y, 40, GREEN, "mm"); check(d, t, 1760, y - 4, 1, 1120 + i, s=1.2)
+    if t > at("before_after", 0.78):
+        text(d, "schema drift · volume drop · late file: report held, owners notified", 960, 860, 38, NAVY)
+    if at("before_after", 0.1) < t < at("before_after", 0.4):
+        stamp(img, f"+${dup_b['revenue_today'] - dup_a['revenue_today']:,.0f} FAKE REVENUE", 560, 930, -4, RED, 46)
+    return img
+
+
+def sc_tech(img, d, t):
+    a = A("tech")
+    boxes = [(110, "Mattermost", "the team chat", SOFT), (690, "Switch", "rooms, @mentions, docs", TEAL),
+             (1270, "Shield agent", "custom Python agent", NAVY)]
+    for i, (x, h_, sub, col) in enumerate(boxes):
+        if seg(t, a + 0.3 + i * 0.5, a + 0.8 + i * 0.5) > 0:
+            wrect(d, x, 160, x + 540, 380, t, 1200 + i, 8, fill=(255, 252, 242))
+            text(d, h_, x + 270, 235, 60, col, "mm", "impact.ttf"); text(d, sub, x + 270, 320, 32, INK)
+    if t > at("tech", 0.25):
+        wline(d, [(650, 270), (690, 270)], t, 1210, 6); wline(d, [(1230, 270), (1270, 270)], t, 1211, 6)
+        text(d, "events stream down (SSE) · operations go up (HTTP) · heartbeat every 2 s", 960, 450, 40, INK)
+    facts = [("149", "lines: the whole Switch client", TEAL), ("5", "Great Expectations checks", ORANGE), ("4B", "Gemma, running locally", NAVY)]
+    for i, (n, lab, col) in enumerate(facts):
+        if t > at("tech", 0.45 + i * 0.15):
+            x = 300 + i * 560; text(d, n, x, 650, 150, col, "mm", "impact.ttf"); text(d, lab, x, 780, 36, INK)
     return img
 
 
@@ -299,46 +359,48 @@ AUDIT = [("user", "break", "duplicate_keys"), ("shield", "found", "F-1 duplicate
 
 def sc_audit(img, d, t):
     a = A("audit")
-    wrect(d, 220, 140, 1500, 820, t, 1300, 8, fill=WHITE)
-    text(d, "Shield audit trail", 260, 200, 56, NAVY, "lm", "impact.ttf")
-    text(d, "room document in Switch", 1460, 200, 32, TEAL, "rm")
-    for c, x in (("who", 270), ("action", 560), ("detail", 860)):
-        text(d, c, x, 290, 34, SOFT, "lm")
-    for i, (w_, ac, de) in enumerate(AUDIT):
-        if t > a + 0.6 + i * 0.6:
-            y = 370 + i * 90; text(d, w_, 270, y, 42, INK, "lm"); text(d, ac, 560, y, 42, INK, "lm"); text(d, de, 860, y, 42, INK, "lm")
+    tape_photo(img, "audit.png", 740, 480, 1220, -1.5, seg(t, a + 0.2, a + 0.9))
+    d = ImageDraw.Draw(img)
+    if t > at("audit", 0.4): text(d, "who · what · when", 1640, 300, 44, NAVY)
+    if t > at("audit", 0.7): stamp(img, "ROOM DOCUMENT", 1640, 480, 6, TEAL, 56)
     return img
 
 
-NUMS = [(6, "incident types", TEAL), (5, "fix actions", NAVY), (0, "without approval", RED),
-        (42, "unit tests", GREEN), (1, "Switch e2e per push", BLUE), (0, "US$ to run", ORANGE)]
+def nums():
+    tl = json.loads((HERE / "timeline.json").read_text(encoding="utf-8")); n = tl["numbers"]
+    out = [(n["caught"], f"of {n['caught']} incidents caught", TEAL, "{:.0f}"), (n["fixed"], "fixed in place", GREEN, "{:.0f}"),
+           (n["held"], "held, owners told", NAVY, "{:.0f}"), (n["scan"], "seconds per scan", ORANGE, "{:.2f}")]
+    if tl.get("chat_reply_max_s") and tl["chat_reply_max_s"] < 2: out.append((2, f"s per Switch reply", BLUE, "<{:.0f}"))
+    else: out.append((0, "fixes without approval", RED, "{:.0f}"))
+    out.append((42, "unit tests", GREEN, "{:.0f}"))
+    return out
 
 
 def sc_numbers(img, d, t):
-    a = A("numbers")
-    for i, (v, lab, col) in enumerate(NUMS):
+    for i, (v, lab, col, fmt) in enumerate(nums()):
         cx = 340 + (i % 3) * 620; cy = 270 + (i // 3) * 380
-        k = seg(t, at("numbers", 0.02 + i * 0.13), at("numbers", 0.12 + i * 0.13))
-        big_number(d, t, cx, cy, v, lab, k, col, 1400 + i)
+        k = seg(t, at("numbers", 0.02 + i * 0.12), at("numbers", 0.12 + i * 0.12))
+        big_number(d, t, cx, cy, v, lab, k, col, 1400 + i, fmt=fmt)
+    if t > at("numbers", 0.88): stamp(img, "US$ 0 TO RUN", 960, 930, -3, ORANGE, 50)
     return img
 
 
 def sc_end(img, d, t):
-    a = A("end"); vend = a + V("end"); m = narr_level(t)
-    shieldy(img, t, 1600, 990, 440, m or 0.0, "talk" if m is not None else "cheer", lift=1.0 if t > vend else 0.3)
+    a = A("end")
+    shieldy(img, t, 1600, 990, 440, 0.0, "cheer", lift=1.0)
     d = ImageDraw.Draw(img); z = eout(seg(t, a, a + 0.5))
     text(d, "SHIELD for data", 760, 300, int(60 + 70 * z), NAVY, "mm", "impact.ttf")
     if t > a + 1.0: text(d, "Checks by Shieldy. Decisions by people.", 760, 430, 48, INK)
     if t > a + 2.0: text(d, "github.com/jenniferevangelista-de/shield-for-data", 760, 540, 36, TEAL)
     if t > a + 2.6: text(d, "Jennifer Evangelista", 760, 640, 46, SOFT)
-    text(d, 'Music: "Monkeys Spinning Monkeys" Kevin MacLeod (incompetech.com), CC BY 4.0 · opening score: original · all data fictional',
+    text(d, 'Music: "Funkorama" Kevin MacLeod (incompetech.com), CC BY 4.0 · opening score: original · all data fictional',
          W / 2, 1050, 22, SOFT)
     return img
 
 
 ORDER = [("hello", sc_hello), ("intro", sc_intro), ("green", sc_green), ("twist", sc_twist), ("cost", sc_cost), ("room", sc_room),
-         ("six", sc_six), ("explain", sc_explain), ("approve", sc_approve), ("guard", sc_guard), ("reject", sc_reject),
-         ("audit", sc_audit), ("numbers", sc_numbers), ("end", sc_end)]
+         ("six", sc_six), ("explain", sc_explain), ("approve", sc_approve), ("before_after", sc_before_after), ("guard", sc_guard),
+         ("reject", sc_reject), ("audit", sc_audit), ("tech", sc_tech), ("numbers", sc_numbers), ("end", sc_end)]
 
 
 def render(t):
@@ -350,7 +412,7 @@ def render(t):
     img = dark_overlay(img, seg(t, A("green") + 2.0, A("twist")) * (1 - seg(t, MUSIC_SWITCH - 0.3, MUSIC_SWITCH + 1.0)))
     if fn not in (sc_hello, sc_intro, sc_end):
         m = narr_level(t); worried = A("twist") <= t < MUSIC_SWITCH
-        cheer = (A("approve") + V("approve") * 0.85 <= t < A("guard")) or (A("numbers") <= t < A("end") and m is None)
+        cheer = (A("approve") + V("approve") * 0.85 <= t < A("before_after")) or (A("numbers") <= t < A("end") and m is None)
         shieldy(img, t, 1800, 1000, 220, m or 0.0, "cheer" if cheer else ("talk" if m is not None else "listen"),
                 emo="worried" if worried else "happy")
     if fn is not sc_end: subtitle(ImageDraw.Draw(img), t)

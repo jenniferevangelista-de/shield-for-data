@@ -1,5 +1,5 @@
 """Mix for the Shield film: an original tonal bed (A minor pads + piano, no heartbeat) under the problem, then
-"Monkeys Spinning Monkeys" (Kevin MacLeod, CC BY 4.0) from the Switch room on. Voices by Ava.
+"Funkorama" (Kevin MacLeod, CC BY 4.0) at 30% from the Switch room on. Voices by Ava.
 No noise anywhere: every effect is tonal (pop, toc, bell, sine sweep), and the music is low-passed so cymbals and
 hi-hats cannot hiss.  python demo/film/audio.py -> demo/film/mix.wav
 """
@@ -15,7 +15,7 @@ from film import A, DUR, MUSIC_SWITCH, V, at, timeline
 
 HERE = Path(__file__).resolve().parent
 SR = 48000; N = int(SR * DUR)
-MUSIC = Path(os.environ.get("SHIELD_MUSIC", "C:/Users/jenni/Downloads/codegames/pipeline/music/incompetech/Monkeys_Spinning_Monkeys.mp3"))
+MUSIC = Path(os.environ.get("SHIELD_MUSIC", "C:/Users/jenni/Downloads/codegames/pipeline/music/incompetech/Funkorama.mp3"))
 
 
 def T(s): return int(s * SR)
@@ -75,19 +75,25 @@ add(sfx, at("green", 0.82), sweep(), 0.8)
 add(sfx, A("twist") + 0.3, pop(), 0.6); add(sfx, at("twist", 0.2), pop(), 0.6); add(sfx, at("twist", 0.33), low_toc(), 0.9)
 add(sfx, at("twist", 0.42), low_toc(), 0.8)
 add(sfx, at("cost", 0.6), low_toc(), 0.8)
-add(sfx, A("room") + 0.6, pop()); add(sfx, at("room", 0.45), chime(1320), 0.7); add(sfx, at("room", 0.8), toc())
+add(sfx, A("room") + 0.3, sweep(), 0.7); add(sfx, at("room", 0.8), toc())
 add(sfx, A("six") + 0.3, sweep(), 0.8)
 for i in range(6): add(sfx, at("six", 0.14 + i * 0.07), tick())
 add(sfx, at("six", 0.75), toc())
-add(sfx, A("explain") + 0.3, sweep(), 0.7)
-for f in (0.15, 0.3, 0.35, 0.45, 0.62): add(sfx, at("explain", f), pop(), 0.5)
+add(sfx, A("explain") + 0.2, sweep(), 0.6)
+for f in (0.2, 0.3, 0.42, 0.55, 0.75): add(sfx, at("explain", f), pop(), 0.5)
 add(sfx, at("approve", 0.3), pop())
 for f, _ in ((0.5, 0), (0.63, 0), (0.78, 0)): add(sfx, at("approve", f + 0.03), chime(1320), 0.6)
-add(sfx, at("approve", 0.88), chime(1568)); add(sfx, at("approve", 0.88) + 0.12, chime(2093))
+add(sfx, at("approve", 0.8), sweep(), 0.6); add(sfx, at("approve", 0.9), chime(1568)); add(sfx, at("approve", 0.9) + 0.12, chime(2093))
 add(sfx, A("guard") + 0.3, pop()); add(sfx, at("guard", 0.45), pop()); add(sfx, at("guard", 0.72), toc())
 add(sfx, at("reject", 0.3), pop()); add(sfx, at("reject", 0.65), pop()); add(sfx, at("reject", 0.85), chime(1568), 0.8)
-for i in range(5): add(sfx, A("audit") + 0.6 + i * 0.6, tick())
-for i in range(6): add(sfx, at("numbers", 0.07 + i * 0.13), chime(1047 + 110 * i), 0.5)
+add(sfx, A("audit") + 0.3, sweep(), 0.7); add(sfx, at("audit", 0.7), toc())
+add(sfx, A("before_after") + 0.2, sweep(), 0.8)
+for f in (0.05, 0.2, 0.38, 0.55):
+    add(sfx, at("before_after", f), low_toc(), 0.5); add(sfx, at("before_after", f + 0.08), chime(1568), 0.6)
+for i in range(3): add(sfx, A("tech") + 0.4 + i * 0.5, pop(), 0.6)
+for i in range(3): add(sfx, at("tech", 0.47 + i * 0.15), chime(1175 + 150 * i), 0.5)
+for i in range(6): add(sfx, at("numbers", 0.07 + i * 0.12), chime(1047 + 110 * i), 0.5)
+add(sfx, at("numbers", 0.88), toc())
 add(sfx, A("end"), chime(880), 1.0); add(sfx, A("end") + 0.15, chime(1320), 1.0)
 
 lp = butter(8, 3800, btype="low", fs=SR, output="sos")
@@ -97,7 +103,7 @@ mk = load(MUSIC) if MUSIC.exists() else np.zeros(N)
 while len(mk) < N: mk = np.concatenate([mk, mk])
 mk = sosfiltfilt(lp, mk[:N]); mk /= (np.abs(mk).max() + 1e-9); dr = sosfiltfilt(lp, dr)
 x = np.clip((np.arange(N) / SR - MUSIC_SWITCH) / 2.0, 0, 1)
-music = dr * (1 - x) * 0.5 + mk * x * 0.26
+music = dr * (1 - x) * 0.5 + mk * x * 0.30
 music[ds:ds + T(1.5)] *= np.linspace(0, 1, T(1.5))
 music[:ds] += mk[:ds] * 0.12                           # light tune under the hellos
 duck = lpf((np.abs(voice) > 0.02).astype(float), SR // 4); duck = 1 - 0.55 * np.clip(duck * 3, 0, 1)

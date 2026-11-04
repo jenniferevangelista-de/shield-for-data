@@ -1,0 +1,228 @@
+{
+ "scenarios": {
+  "stale_business_date": {
+   "finding": "business_date_gate",
+   "summary": "Every job ran green this morning, but for business date 2026-10-29, not 2026-11-05. The newest partition in sales.orders is 2026-11-04.",
+   "evidence": {
+    "required_business_date": "2026-11-05",
+    "newest_business_date_in_table": "2026-11-04",
+    "runs_green_today_for": [
+     "2026-10-29"
+    ],
+    "required_jobs": [
+     "dim_customers",
+     "dim_products",
+     "load_orders"
+    ],
+    "missing_jobs": [
+     "dim_customers",
+     "dim_products",
+     "load_orders"
+    ],
+    "not_successful": {},
+    "authorizing_runs": {}
+   },
+   "fix": [
+    "hold_dashboard",
+    "rerun_partition"
+   ],
+   "before": {
+    "rows_today": 0,
+    "revenue_today": 0.0,
+    "newest_partition": "2026-11-04",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "scheduled"
+   },
+   "after": {
+    "rows_today": 999,
+    "revenue_today": 251126.79,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "scheduled"
+   },
+   "resolved": true,
+   "approve_seconds": 0.08
+  },
+  "row_count_drop": {
+   "finding": "row_count",
+   "summary": "Today's row count dropped to 100 (expected 479 to 1437, from the 7-day median).",
+   "evidence": {
+    "observed_rows": 100,
+    "expected_min": 479,
+    "expected_max": 1437
+   },
+   "fix": [
+    "hold_dashboard",
+    "notify_owners"
+   ],
+   "before": {
+    "rows_today": 100,
+    "revenue_today": 27517.9,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "scheduled"
+   },
+   "after": {
+    "rows_today": 100,
+    "revenue_today": 27517.9,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "held"
+   },
+   "resolved": false,
+   "approve_seconds": 0.04
+  },
+  "schema_drift": {
+   "finding": "schema_drift",
+   "summary": "sales.orders no longer matches its contract. New columns: country_code, discount_cents. Missing columns: country.",
+   "evidence": {
+    "expected": [
+     "order_id",
+     "customer_id",
+     "product_id",
+     "business_date",
+     "amount_cents",
+     "country",
+     "created_at"
+    ],
+    "unexpected": [
+     "country_code",
+     "discount_cents"
+    ],
+    "missing": [
+     "country"
+    ]
+   },
+   "fix": [
+    "hold_dashboard",
+    "notify_owners"
+   ],
+   "before": {
+    "rows_today": 999,
+    "revenue_today": 251126.79,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "scheduled"
+   },
+   "after": {
+    "rows_today": 999,
+    "revenue_today": 251126.79,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "held"
+   },
+   "resolved": false,
+   "approve_seconds": 0.04
+  },
+  "null_spike": {
+   "finding": "null_rate",
+   "summary": "20.0% of today's rows have no customer_id (200 rows; the contract allows 1.0%).",
+   "evidence": {
+    "column": "customer_id",
+    "null_rows": 200,
+    "null_percent": 20.0
+   },
+   "fix": [
+    "quarantine_partition",
+    "notify_owners"
+   ],
+   "before": {
+    "rows_today": 999,
+    "revenue_today": 251126.79,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 200,
+    "duplicate_rows": 0,
+    "report": "scheduled"
+   },
+   "after": {
+    "rows_today": 799,
+    "revenue_today": 199778.46,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "scheduled"
+   },
+   "resolved": true,
+   "approve_seconds": 0.12
+  },
+  "duplicate_keys": {
+   "finding": "duplicate_keys",
+   "summary": "40 order_id values appear more than once today (40 extra rows inflate revenue).",
+   "evidence": {
+    "duplicated_keys": 40,
+    "extra_rows": 40
+   },
+   "fix": [
+    "dedupe_partition"
+   ],
+   "before": {
+    "rows_today": 1039,
+    "revenue_today": 262030.46,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 40,
+    "report": "scheduled"
+   },
+   "after": {
+    "rows_today": 999,
+    "revenue_today": 251126.79,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "scheduled"
+   },
+   "resolved": true,
+   "approve_seconds": 0.19
+  },
+  "late_upstream": {
+   "finding": "late_upstream",
+   "summary": "payments_2026-11-05.csv (owner payments-team) was due at 05:00 UTC and is 120 minutes late.",
+   "evidence": {
+    "file": "payments_2026-11-05.csv",
+    "owner": "payments-team",
+    "expected_by": "2026-11-05T05:00:00+00:00",
+    "minutes_late": 120
+   },
+   "fix": [
+    "hold_dashboard",
+    "notify_owners"
+   ],
+   "before": {
+    "rows_today": 999,
+    "revenue_today": 251126.79,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "scheduled"
+   },
+   "after": {
+    "rows_today": 999,
+    "revenue_today": 251126.79,
+    "newest_partition": "2026-11-05",
+    "null_customer_rows": 0,
+    "duplicate_rows": 0,
+    "report": "held"
+   },
+   "resolved": false,
+   "approve_seconds": 0.18
+  }
+ },
+ "healthy": {
+  "rows_today": 999,
+  "revenue_today": 251126.79,
+  "newest_partition": "2026-11-05",
+  "null_customer_rows": 0,
+  "duplicate_rows": 0,
+  "report": "scheduled"
+ },
+ "warehouse_rows": 7893,
+ "scan_seconds_median": 0.12,
+ "caught": 6,
+ "resolved_in_place": 3
+}
