@@ -19,7 +19,9 @@ Everything here was run on Switch 0.31.0 in a GitHub Codespace. All the data is 
 - **42** unit tests, plus an end-to-end test that plays every scenario through a real Switch server on a fresh GitHub runner
 - **US$ 0** to run: self-hosted Switch, a local open model, free CI
 
-**Watch it work:** [3-minute demo](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_demo.mp4) · [77-second explainer](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_explainer.mp4)
+{% embed https://youtu.be/kAeq5Iub_14 %}
+
+Raw screen recording of the chat, no edits: [shield_demo.mp4](https://github.com/jenniferevangelista-de/shield-for-data/releases/download/v0.1.0/shield_demo.mp4)
 
 ![Approving a fix in the channel: Shield holds the report, re-runs the partition, checks again and releases the hold](https://raw.githubusercontent.com/jenniferevangelista-de/shield-for-data/main/docs/img/approve.gif)
 
