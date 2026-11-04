@@ -9,6 +9,7 @@ Run it after `scripts/up.sh` with the agent running (`python -m shield.agent`).
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 import time
@@ -39,11 +40,17 @@ def load_env(path: str = ".env") -> None:
                 os.environ.setdefault(k, v)
 
 
+TIMINGS: list[dict] = []
+
+
 def step(mm: MattermostUser, ch: str, text: str, expect: str, timeout: float = 120) -> str:
     since = int(time.time() * 1000) - 500
+    t0 = time.perf_counter()
     mm.post(ch, text)
     reply = mm.wait_for(ch, since, expect, timeout=timeout)
-    print(f"  {text!r} -> ok")
+    took = time.perf_counter() - t0
+    TIMINGS.append({"message": text, "seconds": round(took, 2)})
+    print(f"  {text!r} -> ok in {took:.1f} s", flush=True)
     return reply["message"]
 
 
@@ -71,6 +78,7 @@ def main() -> int:
     step(mm, ch, "@shield scan", "F-1")
     step(mm, ch, "@shield reject F-1 false alarm, known test load", "rejected")
     step(mm, ch, "@shield audit", "Shield audit trail")
+    Path("e2e_timings.json").write_text(json.dumps(TIMINGS, indent=1))
     print("End-to-end: every scenario completed through Switch.")
     return 0
 
