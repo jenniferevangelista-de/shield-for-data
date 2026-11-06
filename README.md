@@ -10,6 +10,31 @@ Built for the [Flip the Switch hackathon](https://www.wemakedevs.org/hackathons/
 
 ![Shield's finding in the data-quality channel: what broke, why it matters, who is affected and the proposed fix](docs/img/finding.png)
 
+## Architecture at a glance
+
+![Shield architecture: team chat, Switch server (bridge, room, agent protocol), Shield agent (approval gate, six checks, fix actions, owners, local Gemma) and the DuckDB warehouse](docs/img/architecture.png)
+
+## Measured results
+
+Six problems injected into a 7,893-row warehouse, one at a time, then `@shield scan` and `@shield approve F-1` through the real Switch server. Numbers come from [`demo/film/measure.py`](demo/film/measure.py) ([`measured.json`](demo/film/measured.json)).
+
+| | |
+|---|---|
+| **Problems caught** | **6 of 6** |
+| **Fixed in place after approval** | **3** (re-run, quarantine, dedupe) |
+| **Report held safely, owners told** | **3** (the fix has to come from upstream) |
+| **Median scan time** | **0.12 s** |
+| **Data changed without approval** | **0** |
+
+| Problem injected | What Shield reported | Approved fix | Before → after |
+|---|---|---|---|
+| Stale business date (all jobs green) | Runs were for 2026-10-29, not 2026-11-05 | hold + re-run partition | today's rows 0 → 999, revenue $0 → $251,126.79 |
+| Row count drop | 100 rows, expected 479 to 1,437 | hold + notify owners | report held |
+| Schema drift | `country` missing, `country_code` and `discount_cents` new | hold + notify owners | report held |
+| Null spike on `customer_id` | 200 rows (20.0%), contract allows 1.0% | quarantine + notify owners | null rows 200 → 0, 799 clean rows kept |
+| Duplicate keys | 40 duplicate `order_id` rows | dedupe partition | rows 1,039 → 999, duplicates 40 → 0 |
+| Late upstream file | file missing at the expected time | hold + notify owners | report held |
+
 ---
 
 ## The problem

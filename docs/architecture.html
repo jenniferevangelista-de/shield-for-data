@@ -1,0 +1,109 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Shield architecture</title>
+<style>
+  html,body{margin:0;background:#0f172a;}
+  svg{display:block;font-family:"Segoe UI",Inter,Arial,sans-serif;}
+  .t{fill:#e2e8f0;font-size:20px;font-weight:600}
+  .s{fill:#94a3b8;font-size:15px}
+  .h{fill:#f8fafc;font-size:24px;font-weight:700}
+  .lab{fill:#cbd5e1;font-size:14px}
+</style></head><body>
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#34d399"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#0f172a"/>
+  <text x="60" y="70" style="fill:#f8fafc;font-size:36px;font-weight:800">Shield for data: architecture</text>
+  <text x="60" y="104" class="s" style="font-size:18px">The chat room is the only interface. Nothing changes in the warehouse until a person approves.</text>
+
+  <!-- People -->
+  <rect x="60" y="170" width="300" height="560" rx="18" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <text x="84" y="210" class="h">Team chat</text>
+  <text x="84" y="240" class="s">Mattermost (demo), Slack,</text>
+  <text x="84" y="262" class="s">Teams, Discord, Telegram</text>
+  <g font-family="Consolas,monospace" font-size="16">
+    <rect x="84" y="300" width="252" height="44" rx="10" fill="#0f172a"/><text x="100" y="328" fill="#7dd3fc">@shield scan</text>
+    <rect x="84" y="356" width="252" height="44" rx="10" fill="#0f172a"/><text x="100" y="384" fill="#34d399">@shield approve F-1</text>
+    <rect x="84" y="412" width="252" height="44" rx="10" fill="#0f172a"/><text x="100" y="440" fill="#fbbf24">@shield edit F-1 ...</text>
+    <rect x="84" y="468" width="252" height="44" rx="10" fill="#0f172a"/><text x="100" y="496" fill="#f87171">@shield reject F-1 ...</text>
+    <rect x="84" y="524" width="252" height="44" rx="10" fill="#0f172a"/><text x="100" y="552" fill="#c4b5fd">@shield audit</text>
+  </g>
+  <text x="84" y="610" class="s">Data engineers and analysts</text>
+  <text x="84" y="632" class="s">decide in the channel:</text>
+  <text x="84" y="654" class="s">hold, re-run, quarantine,</text>
+  <text x="84" y="676" class="s">notify owners.</text>
+
+  <!-- Switch -->
+  <rect x="440" y="170" width="330" height="560" rx="18" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+  <text x="464" y="210" class="h">Switch server</text>
+  <rect x="464" y="236" width="282" height="100" rx="12" fill="#312e81"/>
+  <text x="482" y="270" class="t">Collaboration bridge</text>
+  <text x="482" y="296" class="s">one room, any chat platform</text>
+  <text x="482" y="318" class="s">person's name on every message</text>
+  <rect x="464" y="352" width="282" height="150" rx="12" fill="#312e81"/>
+  <text x="482" y="386" class="t">Room "data-quality"</text>
+  <text x="482" y="412" class="s">members = who can approve</text>
+  <text x="482" y="434" class="s">addressing: only @shield</text>
+  <text x="482" y="456" class="s">audit trail = room document</text>
+  <text x="482" y="478" class="s">(create/update_room_document)</text>
+  <rect x="464" y="518" width="282" height="120" rx="12" fill="#312e81"/>
+  <text x="482" y="552" class="t">Agent protocol</text>
+  <text x="482" y="578" class="s">POST /agents (always_on)</text>
+  <text x="482" y="600" class="s">SSE down, HTTP ops up</text>
+  <text x="482" y="622" class="s">heartbeat every 2 s</text>
+
+  <!-- Shield -->
+  <rect x="850" y="170" width="400" height="560" rx="18" fill="#1e293b" stroke="#34d399" stroke-width="2"/>
+  <text x="874" y="210" class="h">Shield agent (Python)</text>
+  <rect x="874" y="236" width="352" height="92" rx="12" fill="#064e3b"/>
+  <text x="892" y="268" class="t">Desk: commands + approval gate</text>
+  <text x="892" y="294" class="s">exact commands change data;</text>
+  <text x="892" y="314" class="s">free text only reads</text>
+  <rect x="874" y="342" width="352" height="150" rx="12" fill="#064e3b"/>
+  <text x="892" y="374" class="t">6 checks</text>
+  <text x="892" y="400" class="s">business-date gate (stale data, green jobs)</text>
+  <text x="892" y="422" class="s">Great Expectations contract: row count,</text>
+  <text x="892" y="444" class="s">schema drift, null spike, duplicate keys</text>
+  <text x="892" y="466" class="s">late or missing upstream file</text>
+  <rect x="874" y="506" width="170" height="104" rx="12" fill="#064e3b"/>
+  <text x="890" y="538" class="t">Fix actions</text>
+  <text x="890" y="562" class="s">hold, re-run,</text>
+  <text x="890" y="582" class="s">quarantine, dedupe</text>
+  <rect x="1056" y="506" width="170" height="104" rx="12" fill="#064e3b"/>
+  <text x="1072" y="538" class="t">Owners</text>
+  <text x="1072" y="562" class="s">lineage.yaml or</text>
+  <text x="1072" y="582" class="s">OpenMetadata</text>
+  <rect x="874" y="624" width="352" height="86" rx="12" fill="#3f3f46"/>
+  <text x="892" y="656" class="t">Gemma 3 via Ollama (local)</text>
+  <text x="892" y="682" class="s">explains impact, reads plain requests</text>
+
+  <!-- Warehouse -->
+  <rect x="1330" y="300" width="220" height="230" rx="18" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+  <ellipse cx="1440" cy="350" rx="70" ry="18" fill="#78350f" stroke="#fbbf24"/>
+  <rect x="1370" y="350" width="140" height="70" fill="#78350f"/>
+  <ellipse cx="1440" cy="420" rx="70" ry="18" fill="#78350f" stroke="#fbbf24"/>
+  <line x1="1370" y1="350" x2="1370" y2="420" stroke="#fbbf24"/><line x1="1510" y1="350" x2="1510" y2="420" stroke="#fbbf24"/>
+  <text x="1440" y="474" class="t" text-anchor="middle">DuckDB warehouse</text>
+  <text x="1440" y="500" class="s" text-anchor="middle">sales.orders + ops.*</text>
+
+  <!-- arrows -->
+  <line x1="362" y1="420" x2="436" y2="420" stroke="#94a3b8" stroke-width="3" marker-start="url(#a)" marker-end="url(#a)"/>
+  <line x1="772" y1="420" x2="846" y2="420" stroke="#94a3b8" stroke-width="3" marker-start="url(#a)" marker-end="url(#a)"/>
+  <line x1="1252" y1="380" x2="1326" y2="380" stroke="#94a3b8" stroke-width="3" marker-end="url(#a)"/>
+  <text x="1258" y="366" class="lab">reads</text>
+  <line x1="1252" y1="560" x2="1360" y2="560" stroke="#34d399" stroke-width="3"/>
+  <line x1="1360" y1="560" x2="1360" y2="534" stroke="#34d399" stroke-width="3" marker-end="url(#g)"/>
+  <text x="1262" y="586" class="lab" style="fill:#34d399">fixes write,</text>
+  <text x="1262" y="606" class="lab" style="fill:#34d399">only after approve</text>
+
+  <!-- loop -->
+  <rect x="60" y="770" width="1490" height="90" rx="16" fill="#111827" stroke="#334155"/>
+  <g font-size="19" fill="#e2e8f0" font-weight="600">
+    <text x="90" y="823">1  scan</text>
+    <text x="250" y="823">→  2  finding with evidence, owners, fix</text>
+    <text x="680" y="823">→  3  person approves / edits / rejects</text>
+    <text x="1080" y="823">→  4  fix  →  5  re-check, release hold</text>
+  </g>
+</svg>
+</body></html>
